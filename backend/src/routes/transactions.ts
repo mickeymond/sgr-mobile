@@ -56,7 +56,7 @@ transactionsRouter.get("/", async (req, res) => {
   }
 
   const transactions: Array<any> = await connection.query(
-    `SELECT * FROM [transaction] WHERE paid_by = ${users[0].user_id};`,
+    `SELECT * FROM [transaction] INNER JOIN [customer] ON [transaction].customer_ref = [customer].customer_ref WHERE paid_by = ${users[0].user_id};`,
   );
   res.json(transactions);
 });

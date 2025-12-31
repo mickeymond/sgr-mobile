@@ -1,8 +1,8 @@
-import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonModal, IonPage, IonRefresher, IonRefresherContent, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonModal, IonPage, IonRefresher, IonRefresherContent, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
 import useSWR from 'swr';
 import { apiClient, apiFetcher } from '../utils/api';
 import { useRef } from 'react';
-import { add } from 'ionicons/icons';
+import { add, chevronForward, enter, exit } from 'ionicons/icons';
 import AddTransaction from '../components/AddTransaction';
 import { useIonAlert } from '@ionic/react';
 import ListViewSkeleton from '../components/ListViewSkeleton';
@@ -67,6 +67,11 @@ const Transactions: React.FC = () => {
         <IonToolbar>
           <IonTitle>Transactions</IonTitle>
         </IonToolbar>
+        <IonToolbar>
+          <IonSearchbar
+            placeholder="Search by name, email..."
+          />
+        </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
@@ -78,8 +83,20 @@ const Transactions: React.FC = () => {
             (<>
               <IonList>
                 {data.map((transaction: any) => (
-                  <IonItem key={transaction.transaction_id}>
-                    <IonLabel>{transaction.transaction_type} | {transaction.amount} | {transaction.customer_ref} | {transaction.transaction_date}</IonLabel>
+                  <IonItem key={transaction.transaction_id} detail={false} button>
+                    <IonIcon
+                      icon={transaction.transaction_type === 'Deposit' ? enter : exit}
+                      color={transaction.transaction_type === 'Deposit' ? 'success' : 'danger'}
+                      slot="start"
+                    />
+
+                    <IonLabel>
+                      <h2>{transaction.transaction_type}</h2>
+                      <p>Customer Ref: <strong>{transaction.first_name} {transaction.last_name}</strong></p>
+                      <p className="subtext">Amount: <strong>GHS {transaction.amount}</strong></p>
+                    </IonLabel>
+
+                    <IonIcon icon={chevronForward} color="medium" slot="end" />
                   </IonItem>
                 ))}
               </IonList><IonFab vertical="bottom" horizontal="end" slot="fixed">

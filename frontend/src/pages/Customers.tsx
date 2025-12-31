@@ -35,7 +35,7 @@ const Customers: React.FC = () => {
             (
               <IonList>
                 {data.map((customer: any) => (
-                  <IonItem key={customer.customer_ref} detail={false} button className="user-item">
+                  <IonItem key={customer.customer_ref} detail={false} button>
                     <IonAvatar slot="start">
                       <img src={`https://ui-avatars.com/api/?name=${customer.first_name} ${customer.last_name}`} alt={customer.first_name} />
                     </IonAvatar>
