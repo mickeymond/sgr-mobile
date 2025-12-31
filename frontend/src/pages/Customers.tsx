@@ -1,8 +1,9 @@
-import { IonAvatar, IonBadge, IonContent, IonHeader, IonItem, IonLabel, IonList, IonPage, IonRefresher, IonRefresherContent, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
+import { IonAvatar, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonRefresher, IonRefresherContent, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
 import useSWR from 'swr';
 import { apiFetcher } from '../utils/api';
 import ListViewSkeleton from '../components/ListViewSkeleton';
 import ErrorState from '../components/ErrorState';
+import { chevronForward } from 'ionicons/icons';
 
 const Customers: React.FC = () => {
   const { data, error, isLoading, mutate } = useSWR('/customers', apiFetcher);
@@ -40,14 +41,12 @@ const Customers: React.FC = () => {
                     </IonAvatar>
 
                     <IonLabel>
-                      <h2 style={{ textDecoration: customer.strike ? 'line-through' : 'none' }}>{customer.first_name} {customer.last_name}</h2>
-                      <p>{customer.email}</p>
-                      <p className="subtext">{customer.phone}</p>
+                      <h2 style={{ textDecoration: customer.active ? 'line-through' : 'none' }}>{customer.first_name} {customer.last_name}</h2>
+                      <p>Ref No: <strong>{customer.customer_ref}</strong></p>
+                      <p className="subtext">Reg on: <strong>{new Date(customer.registerd_date).toDateString()}</strong></p>
                     </IonLabel>
 
-                    <div slot="end" className="item-end">
-                      <IonBadge color="success" mode="ios">{customer.customer_ref}</IonBadge>
-                    </div>
+                    <IonIcon icon={chevronForward} color="medium" slot="end" />
                   </IonItem>
                 ))}
               </IonList>
