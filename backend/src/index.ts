@@ -1,6 +1,7 @@
 import "dotenv/config";
 import ngrok from "@ngrok/ngrok";
 import express from "express";
+import cors from "cors";
 import usersRouter from "./routes/users";
 import customersRouter from "./routes/customers";
 import transactionsRouter from "./routes/transactions";
@@ -9,6 +10,7 @@ import transactionsRouter from "./routes/transactions";
 const app = express();
 
 // Use global middlewares
+app.use(cors());
 app.use(express.json());
 
 // Use routes
