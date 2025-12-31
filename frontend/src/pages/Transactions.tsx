@@ -5,6 +5,8 @@ import { useRef } from 'react';
 import { add } from 'ionicons/icons';
 import AddTransaction from '../components/AddTransaction';
 import { useIonAlert } from '@ionic/react';
+import ListViewSkeleton from '../components/ListViewSkeleton';
+import ErrorState from '../components/ErrorState';
 
 const Transactions: React.FC = () => {
   const { data, error, isLoading, mutate } = useSWR('/transactions', apiFetcher);
@@ -67,51 +69,39 @@ const Transactions: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Transactions</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
 
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : error ? (
-          <div>Error: {error.message}</div>
-        ) : (
-          <IonList>
-            {data.map((transaction: any) => (
-              <IonItem key={transaction.transaction_id}>
-                <IonLabel>{transaction.transaction_type} | {transaction.amount} | {transaction.customer_ref}</IonLabel>
-              </IonItem>
-            ))}
-          </IonList>
-        )}
+        {isLoading ? <ListViewSkeleton /> :
+          error ? <ErrorState message={error.message} onRetry={() => mutate()} /> :
+            (<>
+              <IonList>
+                {data.map((transaction: any) => (
+                  <IonItem key={transaction.transaction_id}>
+                    <IonLabel>{transaction.transaction_type} | {transaction.amount} | {transaction.customer_ref} | {transaction.transaction_date}</IonLabel>
+                  </IonItem>
+                ))}
+              </IonList><IonFab vertical="bottom" horizontal="end" slot="fixed">
+                <IonFabButton id="open-modal">
+                  <IonIcon icon={add}></IonIcon>
+                </IonFabButton>
+              </IonFab><IonModal ref={modal} trigger="open-modal">
+                <IonHeader>
+                  <IonToolbar>
+                    <IonButtons slot="start">
+                      <IonButton onClick={() => modal.current?.dismiss()}>Cancel</IonButton>
+                    </IonButtons>
+                    <IonTitle>Add Transaction</IonTitle>
+                    <IonButtons slot="end">
+                      <IonButton strong={true} onClick={() => confirm()}>Save</IonButton>
+                    </IonButtons>
+                  </IonToolbar>
+                </IonHeader>
 
-        <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton id="open-modal">
-            <IonIcon icon={add}></IonIcon>
-          </IonFabButton>
-        </IonFab>
-
-        <IonModal ref={modal} trigger="open-modal">
-          <IonHeader>
-            <IonToolbar>
-              <IonButtons slot="start">
-                <IonButton onClick={() => modal.current?.dismiss()}>Cancel</IonButton>
-              </IonButtons>
-              <IonTitle>Add Transaction</IonTitle>
-              <IonButtons slot="end">
-                <IonButton strong={true} onClick={() => confirm()}>Save</IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-
-          <AddTransaction />
-        </IonModal>
+                <AddTransaction />
+              </IonModal>
+            </>)}
       </IonContent>
     </IonPage>
   );
