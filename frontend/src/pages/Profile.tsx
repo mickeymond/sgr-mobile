@@ -1,4 +1,4 @@
-import { IonContent, IonHeader, IonPage, IonText, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonPage, IonText, IonTitle, IonToolbar } from '@ionic/react';
 import useSWR from 'swr';
 import { apiFetcher } from '../utils/api';
 import ListViewSkeleton from '../components/ListViewSkeleton';
@@ -16,6 +16,17 @@ const Profile: React.FC = () => {
         </IonToolbar>
         <IonToolbar style={{ textAlign: 'center' }}>
           <IonText color="primary">View Your Profile Information</IonText>
+          <IonButton
+            expand="full"
+            className="ion-margin-horizontal ion-margin-top"
+            color="danger"
+            onClick={() => {
+              localStorage.removeItem("SGR_TOKEN");
+              location.replace("/");
+            }}
+          >
+            Logout
+          </IonButton>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>

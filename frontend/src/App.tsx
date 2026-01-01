@@ -11,6 +11,7 @@ import {
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { people, person, cash } from 'ionicons/icons';
+import Login from './pages/Login';
 import Customers from './pages/Customers';
 import Transactions from './pages/Transactions';
 import Profile from './pages/Profile';
@@ -47,41 +48,38 @@ import './theme/variables.css';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/customers">
-            <Customers />
-          </Route>
-          <Route exact path="/transactions">
-            <Transactions />
-          </Route>
-          <Route path="/profile">
-            <Profile />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/customers" />
-          </Route>
-        </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="customers" href="/customers">
-            <IonIcon aria-hidden="true" icon={people} />
-            <IonLabel>Customers</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="transactions" href="/transactions">
-            <IonIcon aria-hidden="true" icon={cash} />
-            <IonLabel>Transactions</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="profile" href="/profile">
-            <IonIcon aria-hidden="true" icon={person} />
-            <IonLabel>Profile</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route exact path="/customers" component={Customers} />
+            <Route exact path="/transactions" component={Transactions} />
+            <Route exact path="/profile" component={Profile} />
+            <Route
+              exact
+              path="/"
+              render={() => localStorage.getItem("SGR_TOKEN") ? <Redirect to="/customers" /> : <Login />} />
+          </IonRouterOutlet>
+          {localStorage.getItem("SGR_TOKEN") && <IonTabBar slot="bottom">
+            <IonTabButton tab="customers" href="/customers">
+              <IonIcon aria-hidden="true" icon={people} />
+              <IonLabel>Customers</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="transactions" href="/transactions">
+              <IonIcon aria-hidden="true" icon={cash} />
+              <IonLabel>Transactions</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="profile" href="/profile">
+              <IonIcon aria-hidden="true" icon={person} />
+              <IonLabel>Profile</IonLabel>
+            </IonTabButton>
+          </IonTabBar>}
+        </IonTabs>
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 
 export default App;
