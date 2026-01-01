@@ -1,6 +1,6 @@
 import React from 'react';
 import { IonLabel, IonButton, IonIcon, IonText } from '@ionic/react';
-import { alertCircleOutline, refreshOutline } from 'ionicons/icons';
+import { alertCircleOutline, logOutOutline, refreshOutline } from 'ionicons/icons';
 
 interface ErrorProps {
   message?: string;
@@ -25,16 +25,30 @@ const ErrorState: React.FC<ErrorProps> = ({
         <p style={{ margin: '10px 40px' }}>{message}</p>
       </IonLabel>
 
-      <IonButton
-        expand="block"
-        fill="outline"
-        color="primary"
-        onClick={onRetry}
-        style={{ marginTop: '20px' }}
-      >
-        <IonIcon slot="start" icon={refreshOutline} />
-        Try Again
-      </IonButton>
+      {localStorage.getItem("SGR_TOKEN") ?
+        <IonButton
+          expand="block"
+          fill="outline"
+          color="primary"
+          onClick={onRetry}
+          style={{ marginTop: '20px' }}
+        >
+          <IonIcon slot="start" icon={refreshOutline} />
+          Try Again
+        </IonButton> :
+        <IonButton
+          expand="block"
+          fill="outline"
+          color="danger"
+          onClick={() => {
+            localStorage.removeItem("SGR_TOKEN");
+            location.replace("/");
+          }}
+          style={{ marginTop: '20px' }}
+        >
+          <IonIcon slot="start" icon={logOutOutline} />
+          Logout
+        </IonButton>}
     </div>
   );
 };

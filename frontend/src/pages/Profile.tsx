@@ -1,9 +1,10 @@
-import { IonButton, IonContent, IonHeader, IonPage, IonText, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonIcon, IonPage, IonText, IonTitle, IonToolbar } from '@ionic/react';
 import useSWR from 'swr';
 import { apiFetcher } from '../utils/api';
 import ListViewSkeleton from '../components/ListViewSkeleton';
 import ErrorState from '../components/ErrorState';
 import ProfileCard from '../components/ProfileCard';
+import { logOutOutline } from 'ionicons/icons';
 
 const Profile: React.FC = () => {
   const { data, isLoading, error, mutate } = useSWR('/users/me', apiFetcher);
@@ -17,7 +18,8 @@ const Profile: React.FC = () => {
         <IonToolbar style={{ textAlign: 'center' }}>
           <IonText color="primary">View Your Profile Information</IonText>
           <IonButton
-            expand="full"
+            expand="block"
+            fill="outline"
             className="ion-margin-horizontal ion-margin-top"
             color="danger"
             onClick={() => {
@@ -25,6 +27,7 @@ const Profile: React.FC = () => {
               location.replace("/");
             }}
           >
+            <IonIcon slot="start" icon={logOutOutline} />
             Logout
           </IonButton>
         </IonToolbar>
