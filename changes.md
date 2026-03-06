@@ -1,4 +1,5 @@
 - searching customers when adding transactions
+- add a new customer to the list of customers
 - transaction loading was slow
 - retry backend connection when internet is lost
 - audio recording that emily shared
