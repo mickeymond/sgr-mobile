@@ -2,20 +2,21 @@ import React, { useState } from 'react';
 import { IonContent, IonItem, IonSelect, IonSelectOption, IonInput, IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonSearchbar, IonList, IonLabel } from "@ionic/react";
 import useSWR from 'swr';
 import { apiFetcher } from '../utils/api';
+import { Customer } from '../types';
 
 const AddTransaction: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
   const { data, error, isLoading } = useSWR(`/customers${searchQuery ? '?q=' + encodeURIComponent(searchQuery) : ''}`, apiFetcher);
 
   // Save to localStorage
-  const saveToLocalStorage = (key: string, value: any) => {
+  const saveToLocalStorage = (key: string, value: string | number | null | undefined) => {
     localStorage.setItem(key, JSON.stringify(value));
   };
 
-  const handleCustomerSelect = (customer: any) => {
+  const handleCustomerSelect = (customer: Customer) => {
     setSelectedCustomer(customer);
     saveToLocalStorage('SGR_CUSTOMER_REF', customer.customer_ref);
     setIsModalOpen(false);
@@ -56,7 +57,7 @@ const AddTransaction: React.FC = () => {
             <div className="ion-padding">No customers found.</div>
           ) : (
             <IonList>
-              {data?.map((customer: any) => (
+              {data?.map((customer: Customer) => (
                 <IonItem key={customer.customer_ref} button onClick={() => handleCustomerSelect(customer)}>
                   <IonLabel>
                     <h2>{customer.first_name} {customer.last_name}</h2>

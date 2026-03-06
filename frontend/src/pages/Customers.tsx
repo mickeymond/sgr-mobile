@@ -1,12 +1,19 @@
+import React, { useState } from 'react';
 import { IonAvatar, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonRefresher, IonRefresherContent, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
 import useSWR from 'swr';
 import { apiFetcher } from '../utils/api';
 import ListViewSkeleton from '../components/ListViewSkeleton';
 import ErrorState from '../components/ErrorState';
+import EmptyState from '../components/EmptyState';
 import { chevronForward } from 'ionicons/icons';
+import { Customer } from '../types';
 
 const Customers: React.FC = () => {
-  const { data, error, isLoading, mutate } = useSWR('/customers', apiFetcher);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { data, error, isLoading, mutate } = useSWR(
+    `/customers${searchQuery ? '?q=' + encodeURIComponent(searchQuery) : ''}`, 
+    apiFetcher
+  );
 
   const handleRefresh = async (event: CustomEvent) => {
     await mutate();
@@ -21,6 +28,9 @@ const Customers: React.FC = () => {
         </IonToolbar>
         <IonToolbar>
           <IonSearchbar
+            value={searchQuery}
+            onIonInput={(e) => setSearchQuery(e.detail.value!)}
+            debounce={300}
             placeholder="Search by name, email..."
           />
         </IonToolbar>
@@ -32,9 +42,10 @@ const Customers: React.FC = () => {
 
         {isLoading ? <ListViewSkeleton /> :
           error ? <ErrorState message={error.message} onRetry={() => mutate()} /> :
+            data?.length === 0 ? <EmptyState title="No Customers Found" message="Try searching for a different customer name or email." /> :
             (
               <IonList>
-                {data.map((customer: any) => (
+                {data.map((customer: Customer) => (
                   <IonItem key={customer.customer_ref} detail={false} button>
                     <IonAvatar slot="start">
                       <img src={`https://ui-avatars.com/api/?name=${customer.first_name} ${customer.last_name}`} alt={customer.first_name} />

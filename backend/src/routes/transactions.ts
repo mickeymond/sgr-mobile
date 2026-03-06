@@ -55,10 +55,24 @@ transactionsRouter.get("/", async (req, res) => {
     return res.status(401).json({ success: false, message: "Unauthorized" });
   }
 
-  const transactions: Array<any> = await connection.query(
-    `SELECT * FROM [transaction] INNER JOIN [customer] ON [transaction].customer_ref = [customer].customer_ref WHERE paid_by = ${users[0].user_id};`,
+  const q = req.query.q as string;
+  const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
+  const skip = req.query.skip ? parseInt(req.query.skip as string, 10) : 0;
+
+  let query = `SELECT TOP ${limit + skip} * FROM [transaction] INNER JOIN [customer] ON [transaction].customer_ref = [customer].customer_ref WHERE paid_by = ${users[0].user_id}`;
+
+  if (q) {
+    query += ` AND ([customer].first_name LIKE '%${q}%' OR [customer].last_name LIKE '%${q}%')`;
+  }
+
+  query += ` ORDER BY transaction_id DESC;`;
+
+  const transactions: Array<any> = await connection.query(query);
+  const paginatedTransactions = transactions.slice(
+    skip,
+    limit ? skip + limit : undefined,
   );
-  res.json(transactions);
+  res.json(paginatedTransactions);
 });
 
 // Export router

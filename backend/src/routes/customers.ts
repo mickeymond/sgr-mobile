@@ -20,7 +20,7 @@ customersRouter.get("/", async (req, res) => {
   const q = req.query.q as string;
   const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
   const skip = req.query.skip ? parseInt(req.query.skip as string, 10) : 0;
-  
+
   const users: Array<any> = await connection.query(
     `SELECT TOP 1 * FROM usertable WHERE user_name = '${user}' AND [password] = '${password}';`,
   );
@@ -35,7 +35,10 @@ customersRouter.get("/", async (req, res) => {
   query += ` ORDER BY customer_ref DESC;`;
 
   const customers: Array<any> = await connection.query(query);
-  const paginatedCustomers = customers.slice(skip, limit ? skip + limit : undefined);
+  const paginatedCustomers = customers.slice(
+    skip,
+    limit ? skip + limit : undefined,
+  );
   res.json(paginatedCustomers);
 });
 

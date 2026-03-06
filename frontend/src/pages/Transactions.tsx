@@ -1,15 +1,18 @@
 import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonModal, IonPage, IonRefresher, IonRefresherContent, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
 import useSWR from 'swr';
 import { apiClient, apiFetcher } from '../utils/api';
-import { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { add, chevronForward, enter, exit } from 'ionicons/icons';
 import AddTransaction from '../components/AddTransaction';
 import { useIonAlert } from '@ionic/react';
 import ListViewSkeleton from '../components/ListViewSkeleton';
 import ErrorState from '../components/ErrorState';
+import EmptyState from '../components/EmptyState';
+import { Transaction } from '../types';
 
 const Transactions: React.FC = () => {
-  const { data, error, isLoading, mutate } = useSWR('/transactions', apiFetcher);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { data, error, isLoading, mutate } = useSWR(`/transactions${searchQuery ? '?q=' + encodeURIComponent(searchQuery) : ''}`, apiFetcher);
   const modal = useRef<HTMLIonModalElement>(null);
   const [presentAlert] = useIonAlert();
 
@@ -69,6 +72,9 @@ const Transactions: React.FC = () => {
         </IonToolbar>
         <IonToolbar>
           <IonSearchbar
+            value={searchQuery}
+            onIonInput={(e) => setSearchQuery(e.detail.value!)}
+            debounce={300}
             placeholder="Search by name, email..."
           />
         </IonToolbar>
@@ -80,9 +86,10 @@ const Transactions: React.FC = () => {
 
         {isLoading ? <ListViewSkeleton /> :
           error ? <ErrorState message={error.message} onRetry={() => mutate()} /> :
+          data?.length === 0 ? <EmptyState title="No Transactions Found" message="Try adjusting your search criteria or add a new transaction." /> :
             (<>
               <IonList>
-                {data.map((transaction: any) => (
+                {data.map((transaction: Transaction) => (
                   <IonItem key={transaction.transaction_id} detail={false} button>
                     <IonIcon
                       icon={transaction.transaction_type === 'Deposit' ? enter : exit}
