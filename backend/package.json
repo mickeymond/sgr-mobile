@@ -14,8 +14,8 @@
   "license": "ISC",
   "dependencies": {
     "@ngrok/ngrok": "^1.7.0",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "express-basic-auth": "^1.2.1",
     "express-validator": "^7.3.1",

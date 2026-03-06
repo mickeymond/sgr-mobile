@@ -1,36 +1,74 @@
-import { IonContent, IonItem, IonSelect, IonSelectOption, IonInput } from "@ionic/react";
+import React, { useState } from 'react';
+import { IonContent, IonItem, IonSelect, IonSelectOption, IonInput, IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonSearchbar, IonList, IonLabel } from "@ionic/react";
 import useSWR from 'swr';
 import { apiFetcher } from '../utils/api';
 
-
 const AddTransaction: React.FC = () => {
-  const { data, error, isLoading } = useSWR('/customers', apiFetcher);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+
+  const { data, error, isLoading } = useSWR(`/customers${searchQuery ? '?q=' + encodeURIComponent(searchQuery) : ''}`, apiFetcher);
 
   // Save to localStorage
   const saveToLocalStorage = (key: string, value: any) => {
     localStorage.setItem(key, JSON.stringify(value));
   };
 
+  const handleCustomerSelect = (customer: any) => {
+    setSelectedCustomer(customer);
+    saveToLocalStorage('SGR_CUSTOMER_REF', customer.customer_ref);
+    setIsModalOpen(false);
+  };
+
   return (
     <IonContent className="ion-padding">
-      <IonItem>
-        <IonSelect
-          label="Customer"
-          placeholder="Select Customer"
-          onIonChange={(e) => saveToLocalStorage('SGR_CUSTOMER_REF', e.detail.value)}>
-          {isLoading ? (
-            <div>Loading...</div>
-          ) : error ? (
-            <div>Error: {error.message}</div>
-          ) : (
-            data?.map((customer: any) => (
-              <IonSelectOption key={customer.customer_ref} value={customer.customer_ref}>
-                {customer.first_name} {customer.last_name}
-              </IonSelectOption>
-            ))
-          )}
-        </IonSelect>
+      <IonItem button onClick={() => setIsModalOpen(true)}>
+        <IonLabel>Customer</IonLabel>
+        <div slot="end" style={{ color: selectedCustomer ? 'inherit' : 'gray' }}>
+          {selectedCustomer ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}` : 'Select Customer'}
+        </div>
       </IonItem>
+
+      <IonModal isOpen={isModalOpen} onDidDismiss={() => setIsModalOpen(false)}>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>Select Customer</IonTitle>
+            <IonButtons slot="end">
+              <IonButton onClick={() => setIsModalOpen(false)}>Close</IonButton>
+            </IonButtons>
+          </IonToolbar>
+          <IonToolbar>
+            <IonSearchbar 
+              value={searchQuery} 
+              onIonInput={(e) => setSearchQuery(e.detail.value!)} 
+              debounce={300} 
+              placeholder="Search customers..." 
+            />
+          </IonToolbar>
+        </IonHeader>
+        <IonContent>
+          {isLoading ? (
+            <div className="ion-padding">Loading...</div>
+          ) : error ? (
+            <div className="ion-padding">Error: {error.message}</div>
+          ) : data?.length === 0 ? (
+            <div className="ion-padding">No customers found.</div>
+          ) : (
+            <IonList>
+              {data?.map((customer: any) => (
+                <IonItem key={customer.customer_ref} button onClick={() => handleCustomerSelect(customer)}>
+                  <IonLabel>
+                    <h2>{customer.first_name} {customer.last_name}</h2>
+                    {customer.other_name && <p>{customer.other_name}</p>}
+                  </IonLabel>
+                </IonItem>
+              ))}
+            </IonList>
+          )}
+        </IonContent>
+      </IonModal>
+
       <IonItem>
         <IonSelect
           label="Transaction Type"
