@@ -1,5 +1,4 @@
-- searching customers when adding transactions
-- add a new customer to the list of customers
-- transaction loading was slow
-- retry backend connection when internet is lost
-- audio recording that emily shared
+-- Ensure account balance for user is debitted for withdrawals and creditted for deposits
+-- Add the timestamp to the list item for every transaction
+-- Add the reference id to the customer name when searching for customers to add transaction
+-- Disable withdrawals on the UI and backend when adding transactions.
